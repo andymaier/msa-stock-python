@@ -1,7 +1,4 @@
-"""Kafka-Anbindung: Operation, Producer, ShopListener.
-
-TODO (Uebung): den Listener implementieren.
-"""
+"""Kafka-Anbindung: Operation, Producer, ShopListener - Loesung."""
 import json
 import threading
 from dataclasses import dataclass
@@ -46,12 +43,15 @@ class ShopListener:
         self.store = store
 
     def handle(self, op: Operation):
-        # TODO: Operation verarbeiten.
-        #   - bo == "stock":  action create/update/upsert -> store.save(op.object)
-        #                     action delete                -> store.delete(uuid)
-        #   - bo == "basket" (action "upsert"): fuer jedes Item im Warenkorb
-        #                     store.decrement(articleId, quantity)
-        raise NotImplementedError("ShopListener.handle noch nicht implementiert")
+        obj = op.object or {}
+        if op.bo == "stock":
+            if op.action in ("create", "update", "upsert"):
+                self.store.save(obj)
+            elif op.action == "delete":
+                self.store.delete(obj.get("uuid"))
+        elif op.bo == "basket" and op.action == "upsert":
+            for item in (obj.get("items") or []):
+                self.store.decrement(item.get("articleId"), item.get("quantity", 0))
 
     def start(self):
         threading.Thread(target=self._consume, daemon=True).start()
