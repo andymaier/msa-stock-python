@@ -1,7 +1,7 @@
 # msa-stock (Python)
 
 Python-Portierung des Java/Spring-Boot-Service `stock` (predic8-MSA-Shop).
-Flask (REST) + kafka-python (Event-Anbindung), In-Memory-Store.
+Flask (REST) + confluent-kafka (Event-Anbindung), In-Memory-Store.
 
 ## Architektur
 - REST `GET /stocks`, `GET /stocks/count`.
